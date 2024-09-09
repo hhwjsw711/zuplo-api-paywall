@@ -1,0 +1,11 @@
+.zuplo/
+.cache/
+dist/
+node_modules/
+.env
+.husky/_
+.npmrc
+.env.zuplo
+
+# OS Stuff
+.DS_Store

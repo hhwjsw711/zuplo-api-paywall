@@ -1,0 +1,13 @@
+{
+  "name": "samples-todo-list",
+  "version": "1.0.0",
+  "author": "",
+  "copyright": "",
+  "scripts": {
+    "dev": "zup dev"
+  },
+  "dependencies": {
+    "stripe": "^14.10.0",
+    "zuplo": "^1.20240826.804"
+  }
+}

@@ -1,0 +1,189 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Todo List API",
+    "description": "Example API, built using [Zuplo](https://zuplo.com/), for managing tasks within a todo list. You can find the source code for this example [here](https://github.com/zuplo/samples-todo-list-open-api).",
+    "version": "1.0.0"
+  },
+  "tags": [
+    {
+      "name": "Standard Todo List Endpoints",
+      "description": "Standard endpoints for managing todos list items."
+    },
+    {
+      "name": "Extended Todo List Endpoints",
+      "description": "Extended endpoints for managing todos list items. The endpoints are mainly for convenience, performing common operations on top of the standard endpoints."
+    }
+  ],
+  "components": {
+    "schemas": {
+      "VideoObject": {
+        "type": "object",
+        "required": [
+          "model",
+          "prompt"
+        ],
+        "properties": {
+          "model": {
+            "type": "string"
+          },
+          "prompt": {
+            "type": "string"
+          }
+        },
+        "examples": [
+          {
+            "model": "video-01",
+            "prompt": "海边鱼肚子里发现一张纸条上面写着MiniMax。"
+          }
+        ]
+      },
+      "AnonymousTodoObject": {
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "completed"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "completed": {
+            "type": "boolean"
+          }
+        },
+        "examples": [
+          {
+            "id": 1,
+            "title": "Take out the trash",
+            "completed": false
+          }
+        ]
+      },
+      "SchemaValidationError": {
+        "type": "object",
+        "required": [
+          "type",
+          "title",
+          "status",
+          "detail",
+          "instance"
+        ],
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "status": {
+            "type": "number"
+          },
+          "detail": {
+            "type": "string"
+          },
+          "instance": {
+            "type": "string"
+          },
+          "trace": {
+            "type": "object"
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1
+          }
+        },
+        "examples": [
+          {
+            "type": "https://httpproblems.com/http-status/400",
+            "title": "Bad Request",
+            "status": 400,
+            "detail": "Incoming body did not pass schema validation",
+            "instance": "/v1/todos",
+            "trace": {
+              "timestamp": "2023-02-27T18:53:05.997Z",
+              "requestId": "b1e1c2a9-da7b-436c-aa89-2f78918047b2",
+              "buildId": "83e3d0f1-89a8-46ea-b040-e0a2432f2ea5",
+              "rayId": "7a031f102747944d-SJC"
+            },
+            "errors": [
+              "Body must have required property 'userId'"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "paths": {
+    "/v1/videos": {
+      "x-zuplo-path": {
+        "pathMode": "open-api"
+      },
+      "post": {
+        "summary": "Create Video",
+        "description": "Creates a todo list item.",
+        "x-zuplo-route": {
+          "corsPolicy": "none",
+          "handler": {
+            "export": "urlRewriteHandler",
+            "module": "$import(@zuplo/runtime)",
+            "options": {
+              "rewritePattern": "https://api.minimax.chat/v1/video_generation",
+              "forwardSearch": true
+            }
+          },
+          "policies": {
+            "inbound": [
+              "composite-metered-request",
+              "set-headers-inbound-1"
+            ]
+          }
+        },
+        "tags": [
+          "Standard Todo List Endpoints"
+        ],
+        "operationId": "f9e30d74-56ca-4f1e-bcb3-75fe305ea5e4",
+        "requestBody": {
+          "description": "Payload required to create a todo list item.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VideoObject"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The created todo list item",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VideoObject"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Schema validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchemaValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
