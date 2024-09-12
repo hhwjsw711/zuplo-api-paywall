@@ -117,6 +117,66 @@
       },
       "name": "set-headers-inbound-1",
       "policyType": "set-headers-inbound"
+    },
+    {
+      "handler": {
+        "export": "CompositeInboundPolicy",
+        "module": "$import(@zuplo/runtime)",
+        "options": {
+          "policies": [
+            "api-key-inbound",
+            "metered-request"
+          ]
+        }
+      },
+      "name": "composite-inbound",
+      "policyType": "composite-inbound"
+    },
+    {
+      "handler": {
+        "export": "SetHeadersInboundPolicy",
+        "module": "$import(@zuplo/runtime)",
+        "options": {
+          "headers": [
+            {
+              "name": "Authorization",
+              "value": "Bearer $env(MINIMAX_KEY)"
+            }
+          ]
+        }
+      },
+      "name": "set-headers-inbound-2",
+      "policyType": "set-headers-inbound"
+    },
+    {
+      "handler": {
+        "export": "CompositeInboundPolicy",
+        "module": "$import(@zuplo/runtime)",
+        "options": {
+          "policies": [
+            "api-key-inbound",
+            "metered-request"
+          ]
+        }
+      },
+      "name": "composite-inbound-1",
+      "policyType": "composite-inbound"
+    },
+    {
+      "handler": {
+        "export": "SetHeadersInboundPolicy",
+        "module": "$import(@zuplo/runtime)",
+        "options": {
+          "headers": [
+            {
+              "name": "Authorization",
+              "value": "Bearer $env(MINIMAX_KEY)"
+            }
+          ]
+        }
+      },
+      "name": "set-headers-inbound-3",
+      "policyType": "set-headers-inbound"
     }
   ]
 }
