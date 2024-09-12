@@ -1,18 +1,18 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "Todo List API",
-    "description": "Example API, built using [Zuplo](https://zuplo.com/), for managing tasks within a todo list. You can find the source code for this example [here](https://github.com/zuplo/samples-todo-list-open-api).",
+    "title": "Video Generation API",
+    "description": "The API supports dynamic video generation based on a user-provided prompt. This endpoint uses asynchronous calls to submit tasks. After a task is submitted, the API will return a task ID. You can later check the status of the video generation task and retrieve the file ID of the generated output via the asynchronous task query endpoint.Once the task is completed, you can download the generated file using the File (Retrieve) endpoint with the file ID. Please note that the URL provided for download is valid for 9 hours (i.e., 32,400 seconds) from the moment it is returned. After the expiration time, the URL will become invalid, and the generated information will be lost, so ensure to download the file in time.",
     "version": "1.0.0"
   },
   "tags": [
     {
-      "name": "Standard Todo List Endpoints",
-      "description": "Standard endpoints for managing todos list items."
+      "name": "Create Video Generation Task API",
+      "description": "Obtain a `task_id` by creating a video generation task."
     },
     {
-      "name": "Extended Todo List Endpoints",
-      "description": "Extended endpoints for managing todos list items. The endpoints are mainly for convenience, performing common operations on top of the standard endpoints."
+      "name": "Query Video Generation Task Status API",
+      "description": "Query the video generation task status based on the `task_id`. If the task is successfully completed, use the `file_id` returned by the query to view and download the result via the File API."
     }
   ],
   "components": {
@@ -38,29 +38,195 @@
           }
         ]
       },
-      "AnonymousTodoObject": {
+      "TaskObject": {
         "type": "object",
         "required": [
-          "id",
-          "title",
-          "completed"
+          "task_id"
         ],
         "properties": {
-          "id": {
+          "task_id": {
             "type": "string"
-          },
-          "title": {
-            "type": "string"
-          },
-          "completed": {
-            "type": "boolean"
           }
         },
         "examples": [
           {
-            "id": 1,
-            "title": "Take out the trash",
-            "completed": false
+            "task_id": "1726133237341"
+          }
+        ]
+      },
+      "FileObject": {
+        "type": "object",
+        "required": [
+          "group_id",
+          "file_id"
+        ],
+        "properties": {
+          "group_id": {
+            "type": "string"
+          },
+          "file_id": {
+            "type": "string"
+          }
+        },
+        "examples": [
+          {
+            "group_id": "1759485152339173385",
+            "file_id": "182599484219585"
+          }
+        ]
+      },
+      "OperationSuccess": {
+        "type": "object",
+        "required": [
+          "task_id",
+          "base_resp"
+        ],
+        "properties": {
+          "task_id": {
+            "type": "string"
+          },
+          "base_resp": {
+            "type": "string",
+            "properties": {
+              "status_code": {
+                "type": "string"
+              },
+              "status_msg": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "status_code",
+              "status_msg"
+            ]
+          }
+        },
+        "examples": [
+          {
+            "task_id": "1726133237341",
+            "base_resp": {
+              "status_code": "0",
+              "status_msg": "success"
+            }
+          }
+        ]
+      },
+      "RetrieveTaskIdSuccess": {
+        "type": "object",
+        "required": [
+          "task_id",
+          "status",
+          "file_id",
+          "base_resp"
+        ],
+        "properties": {
+          "task_id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["Success"]
+          },
+          "file_id": {
+            "type": "string"
+          },
+          "base_resp": {
+            "type": "object",
+            "properties": {
+              "status_code": {
+                "type": "integer"
+              },
+              "status_msg": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "status_code",
+              "status_msg"
+            ]
+          }
+        },
+        "examples": [
+          {
+            "task_id": "1726133237341",
+            "status": "Success",
+            "file_id": "182599484219585",
+            "base_resp": {
+              "status_code": 0,
+              "status_msg": "success"
+            }
+          }
+        ]
+      },
+      "RetrieveFileIdSuccess": {
+        "type": "object",
+        "required": [
+          "file",
+          "base_resp"
+        ],
+        "properties": {
+          "file": {
+            "type": "object",
+            "required": [
+              "file_id",
+              "bytes",
+              "created_at",
+              "filename",
+              "purpose",
+              "download_url"
+            ],
+            "properties": {
+              "file_id": {
+                "type": "string"
+              },
+              "bytes": {
+                "type": "integer"
+              },
+              "created_at": {
+                "type": "integer"
+              },
+              "filename": {
+                "type": "string"
+              },
+              "purpose": {
+                "type": "string"
+              },
+              "download_url": {
+                "type": "string",
+                "format": "uri"
+              }
+            }
+          },
+          "base_resp": {
+            "type": "object",
+            "required": [
+              "status_code",
+              "status_msg"
+            ],
+            "properties": {
+              "status_code": {
+                "type": "integer"
+              },
+              "status_msg": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "examples": [
+          {
+            "file": {
+              "file_id": "182599484219585",
+              "bytes": 0,
+              "created_at": 1726132931,
+              "filename": "output.mp4",
+              "purpose": "video_generation",
+              "download_url": "https://public-cdn-video-data-algeng.oss-cn-wulanchabu.aliyuncs.com/inference_output%2Fvideo%2F2024-09-12%2F49ac71af-f68f-457a-8ec0-920134e56526%2Foutput.mp4?Expires=1726165912&OSSAccessKeyId=LTAI5tGLnRTkBjLuYPjNcKQ8&Signature=COurvwT5kU19LDeLT4ayJzP3wFk%3D"
+            },
+            "base_resp": {
+              "status_code": 0,
+              "status_msg": "success"
+            }
           }
         ]
       },
@@ -91,31 +257,21 @@
           },
           "trace": {
             "type": "object"
-          },
-          "errors": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "minItems": 1
           }
         },
         "examples": [
           {
-            "type": "https://httpproblems.com/http-status/400",
-            "title": "Bad Request",
-            "status": 400,
-            "detail": "Incoming body did not pass schema validation",
-            "instance": "/v1/todos",
+            "type": "https://httpproblems.com/http-status/401",
+            "title": "Unauthorized",
+            "status": 401,
+            "detail": "Authorization Failed",
+            "instance": "/v1/videos",
             "trace": {
-              "timestamp": "2023-02-27T18:53:05.997Z",
-              "requestId": "b1e1c2a9-da7b-436c-aa89-2f78918047b2",
-              "buildId": "83e3d0f1-89a8-46ea-b040-e0a2432f2ea5",
-              "rayId": "7a031f102747944d-SJC"
-            },
-            "errors": [
-              "Body must have required property 'userId'"
-            ]
+              "timestamp": "2024-09-12T08:26:46.259Z",
+              "requestId": "d15c8868-7bf4-435d-9520-aa79c196f458",
+              "buildId": "e99126f5-ffe9-4224-8b14-a3ba9ca3e51b",
+              "rayId": "8c1e83b5eef34a75"
+            }
           }
         ]
       }
@@ -128,7 +284,7 @@
       },
       "post": {
         "summary": "Create Video",
-        "description": "Creates a todo list item.",
+        "description": "Video Generation.",
         "x-zuplo-route": {
           "corsPolicy": "none",
           "handler": {
@@ -147,11 +303,11 @@
           }
         },
         "tags": [
-          "Standard Todo List Endpoints"
+          "Create Video Generation Task API"
         ],
         "operationId": "f9e30d74-56ca-4f1e-bcb3-75fe305ea5e4",
         "requestBody": {
-          "description": "Payload required to create a todo list item.",
+          "description": "Payload required for video generation.",
           "required": true,
           "content": {
             "application/json": {
@@ -162,22 +318,120 @@
           }
         },
         "responses": {
-          "201": {
-            "description": "The created todo list item",
+          "200": {
+            "description": "The generated video",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/VideoObject"
+                  "$ref": "#/components/schemas/OperationSuccess"
                 }
               }
             }
           },
-          "400": {
+          "401": {
             "description": "Schema validation error",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/SchemaValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/videos/:taskId": {
+      "x-zuplo-path": {
+        "pathMode": "open-api"
+      },
+      "get": {
+        "summary": "Get Video by ID",
+        "description": "Create Video Generation Task API",
+        "x-zuplo-route": {
+          "corsPolicy": "none",
+          "handler": {
+            "export": "urlRewriteHandler",
+            "module": "$import(@zuplo/runtime)",
+            "options": {
+              "rewritePattern": "https://api.minimax.chat/v1/query/video_generation?task_id=${params.taskId}"
+            }
+          },
+          "policies": {
+            "inbound": [
+              "composite-inbound",
+              "set-headers-inbound-2"
+            ]
+          }
+        },
+        "operationId": "4b33c2d1-da22-46d3-92aa-82f38c75fee8",
+        "requestBody": {
+          "description": "Create Video Generation Task API",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TaskObject"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Retrieve Task ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RetrieveTaskIdSuccess"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/videos/:groupId/:fileId": {
+      "x-zuplo-path": {
+        "pathMode": "open-api"
+      },
+      "get": {
+        "summary": "Get File by ID",
+        "description": "Query Video Generation Task Status API",
+        "x-zuplo-route": {
+          "corsPolicy": "none",
+          "handler": {
+            "export": "urlRewriteHandler",
+            "module": "$import(@zuplo/runtime)",
+            "options": {
+              "rewritePattern": "https://api.minimax.chat/v1/files/retrieve?GroupId=${params.groupId}&file_id=${params.fileId}"
+            }
+          },
+          "policies": {
+            "inbound": [
+              "composite-inbound-1",
+              "set-headers-inbound-3"
+            ]
+          }
+        },
+        "operationId": "08505d78-4170-4d66-8702-6de3a16ed835",
+        "requestBody": {
+          "description": "Query Video Generation Task Status API",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FileObject"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Retrieve File ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RetrieveFileIdSuccess"
                 }
               }
             }
